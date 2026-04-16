@@ -6,7 +6,7 @@ type PartialDict<T> = Partial<{ [key in AccessorCode]: T }>
 
 type Extended<T> = { flag: boolean, value: T }
 
-// "extends {}" oder "extends object"?
+// "extends {}" oder "extends object" oder "extends Object"?
 
 type WriteLocked<Type> = { + readonly [Property in keyof Type]: Type[Property] extends object ? WriteLocked<Type[Property]> : Type[Property] }
 
