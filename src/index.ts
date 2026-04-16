@@ -4,11 +4,11 @@ type AccessorCode = (typeof ALL_ACCESSORS)[number]
 
 type PartialDict<T> = Partial<{ [key in AccessorCode]: T }>
 
-type Extended<T> = {flag: boolean, value: T}
+type Extended<T> = { flag: boolean, value: T }
 
 type WriteLocked<Type> = { + readonly [Property in keyof Type]: Type[Property] extends {} ? WriteLocked<Type[Property]> : Type[Property] }
 
-type AltWriteLocked<Type> = {[Property in keyof Type]: Type[Property] extends {} ? AltWriteLocked<Type[Property]> : Readonly<Type[Property]> }
+type AltWriteLocked<Type> = Type extends {} ? Readonly<{[Property in keyof Type]: AltWriteLocked<Type[Property]>}> : Readonly<Type>
 
 class FunkyClass {
 
@@ -41,8 +41,6 @@ function altLockInterface<T>(element: T): AltWriteLocked<T> {
 }
 
 
-
-
 const myCoord1: Coordinates = {x: 1, y: 2}
 
 const biggerObject: Composition = {
@@ -57,6 +55,7 @@ const gigaObject: Giga = {
 const locked = lockInterface(myCoord1);
 const lockedBig = lockInterface(biggerObject)
 const lockedGiga = lockInterface(gigaObject);
-const altLocked = altLockInterface(lockedBig);
-altLocked.x = 5
+const altLocked = altLockInterface(gigaObject);
+altLocked.composed.x = 5
+
 
