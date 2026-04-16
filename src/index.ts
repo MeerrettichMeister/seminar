@@ -6,9 +6,11 @@ type PartialDict<T> = Partial<{ [key in AccessorCode]: T }>
 
 type Extended<T> = { flag: boolean, value: T }
 
-type WriteLocked<Type> = { + readonly [Property in keyof Type]: Type[Property] extends {} ? WriteLocked<Type[Property]> : Type[Property] }
+// "extends {}" oder "extends object"?
 
-type AltWriteLocked<Type> = Type extends {} ? Readonly<{[Property in keyof Type]: AltWriteLocked<Type[Property]>}> : Readonly<Type>
+type WriteLocked<Type> = { + readonly [Property in keyof Type]: Type[Property] extends object ? WriteLocked<Type[Property]> : Type[Property] }
+
+type AltWriteLocked<Type> = Type extends object ? Readonly<{[Property in keyof Type]: AltWriteLocked<Type[Property]>}> : Type
 
 class FunkyClass {
 
