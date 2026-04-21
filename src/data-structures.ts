@@ -46,7 +46,7 @@ export class PartTemplate {
     public static readonly EXHAUST_TEMPLATE: CarPart = new CarPart({de: "Auspuff"}, "exhaust", [])
     public static readonly WINDOW_TEMPLATE: CarPart = new CarPart({de: "Scheibe"}, "window", [])
 
-    public newPartFromTemplate(template: CarPart): CarPart {
+    public static newPartFromTemplate(template: CarPart): CarPart {
         return structuredClone(template)
     }
 

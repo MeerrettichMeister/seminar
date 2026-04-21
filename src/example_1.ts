@@ -19,6 +19,7 @@ const userInput = "Hochleistungsfedern 1-15"
  * Das wollten wir aber eigentlich garnicht.
  */
 
+// Implizit
 PartTemplate.EXHAUST_TEMPLATE.name.de = userInput
 
 /**
@@ -26,3 +27,5 @@ PartTemplate.EXHAUST_TEMPLATE.name.de = userInput
  * Mit Bestätigung des Dialoges wird ein neues Teil angelegt.
  */
 
+const newExhaust = PartTemplate.newPartFromTemplate(PartTemplate.EXHAUST_TEMPLATE)
+newExhaust.name.de = userInput;
