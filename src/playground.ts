@@ -58,6 +58,6 @@ const locked = lockInterface(myCoord1);
 const lockedBig = lockInterface(biggerObject)
 const lockedGiga = lockInterface(gigaObject);
 const altLocked = altLockInterface(gigaObject);
-altLocked.composed.x = 5
+// altLocked.composed.x = 5
 
 
