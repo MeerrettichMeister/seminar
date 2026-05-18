@@ -1,1 +1,1 @@
-export type NonWritable<Type> = Type extends Object ? Readonly<{ [Property in keyof Type]: NonWritable<Type[Property]> }> : Type
+export type NonWritable<T> = T extends Object ? Readonly<{ [Property in keyof T]: NonWritable<T[Property]> }> : T
