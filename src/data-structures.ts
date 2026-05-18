@@ -8,7 +8,6 @@ export type MultilanguageString = Partial<{ [key in LanguageCode]: String }>
 
 export type PartCategory = "springs" | "rims" | "exhaust" | "window"
 
-
 export class CarPart {
     public constructor(private _name: MultilanguageString, private _partType: PartCategory,
                        private _compatibleBrands: string[]

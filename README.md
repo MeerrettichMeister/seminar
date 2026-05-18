@@ -2,14 +2,45 @@
 
 ## Problemstellung
 
+### Simpel
+
+Wir haben einen simplen Typ, welcher Ländercodes auf Strings abbildet.
+```ts
+const LANGUAGE_CODES = ["en", "es", "de", "fr", "it"] as const;
+
+export type LanguageCode = (typeof LANGUAGE_CODES)[number];
+
+export type MultilanguageString = Partial<{ [key in LanguageCode]: String }>
+
+export const greetings:MultilanguageString = {en: "Hello", es: "Hola", de: "Hallo", fr: "Bonjour", it: "Ciao"}
+```
+Wir möchten nun verhindern, dass andere Entwickler ausversehen die vordefinierten Begrüßungen überschreiben,  
+und sollten Sie dies doch tun, dann soll der Code nicht kompilieren.
+
+### Exemplarisch
+
 Wir betrachten eine Anwendung zur Verwaltung eines Kfz Teilekataloges von einem Unternehmen, welches
 Ersatzteile produziert.
 
 Zum Anlegen neuer Ersatzteile kann ein Mitarbeiter Vorlagen verwenden, um das neue Ersatzteil schneller im System
 hinzuzufügen.
+```ts
+export class PartTemplate {
+  public static readonly SPRINGS_TEMPLATE: CarPart = new CarPart({de: "Feder"}, "springs", [])
+  public static readonly RIMS_TEMPLATE: CarPart = new CarPart({de: "Felge"}, "rims", [])
+  public static readonly EXHAUST_TEMPLATE: CarPart = new CarPart({de: "Auspuff"}, "exhaust", [])
+  public static readonly WINDOW_TEMPLATE: CarPart = new CarPart({de: "Scheibe"}, "window", [])
 
+  public static newPartFromTemplate(template: CarPart): CarPart {
+    return structuredClone(template)
+  }
+
+}
+```
 Aufgrund eines Entwicklungsfehlers führen Nutzereingaben in der Maske dazu, dass die Namen des Ersatzteils in der
 Vorlage überschreiben werden, und somit an anderen Stellen der Anwendung zu fehlern führen.
+
+![Beispielablauf](/src/img/CarPart_Sequence.png)
 
 Die betreffende Stelle im Quellcode konnte schnell abgeändert werden, um den Fehler zu beheben.  
 Idealerweise würden wir jedoch Code schreiben wollen, welcher solche Fehler beim Entwickeln bereits verhindert.  
@@ -17,7 +48,7 @@ Wie könnte man so etwas lösen?
 
 ## Naive Lösung
 
-- Wir setzen die Felder des Interface `MultilanguageString` auf `readonly`  
+- Wir setzen die Felder des Typs `MultilanguageString` auf `readonly`  
   Nicht machbar, da einerseits nicht gewährleistet ist, dass an anderen Stellen im Code ein Eintrag in einem
   `MultilanguageString` nicht abgeändert werden muss und somit die Anwendung nicht mehr zuverlässig arbeitet.  
   Des Weiteren können notwendige Datenstrukturen aus fremden Bibliotheken stammen bei welchen die Anpassung des
@@ -35,7 +66,7 @@ Wir definieren einen eigenen neuen generischen Type, welcher den Datentyp kapsel
 schützen wollen.
 
 ```ts
-export type NonWritable<Type> = Type extends Object ? Readonly<{ [Property in keyof Type]: NonWritable<Type[Property]> }> : Type
+export type NonWritable<T> = T extends Object ? Readonly<{ [Property in keyof T]: NonWritable<T[Property]> }> : T
 ```
 
 Hierbei machen wir uns mehrere Sprachfeatures von TypeScript, sowie generelle Programmierkonzepte zunutze.

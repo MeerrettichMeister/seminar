@@ -12,7 +12,7 @@ const displayedName = PartTemplate.EXHAUST_TEMPLATE.name.de
  * Binding erfolgt über model() Signal (Read & Write)
  */
 
-const userInput = "Hochleistungsfedern 1-15"
+const userInput = "Hochleistungsauspuff 1-15"
 
 /**
  * Binding bewirkt implizite Überschreibung des Templates.
