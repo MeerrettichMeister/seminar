@@ -42,6 +42,40 @@ Vorlage überschreiben werden, und somit an anderen Stellen der Anwendung zu feh
 
 ![Beispielablauf](/src/img/CarPart_Sequence.png)
 
+```ts
+import {CarPart, PartTemplate} from "./data-structures";
+
+
+/**
+ * Der Nutzer soll über einen Dialog einen neuen Auspuff im System anlegen können.
+ * In einem FormField wird der Standartname angezeigt, welcher der Nutzer ändern kann.
+ */
+
+const displayedName = PartTemplate.EXHAUST_TEMPLATE.name.de
+
+/**
+ * Binding erfolgt über model() Signal (Read & Write)
+ */
+
+const userInput = "Hochleistungsauspuff 1-15"
+
+/**
+ * Binding bewirkt implizite Überschreibung des Templates.
+ * Das wollten wir aber eigentlich garnicht.
+ */
+
+// Implizit
+PartTemplate.EXHAUST_TEMPLATE.name.de = userInput
+
+/**
+ * Der Nutzer bekommt davon nichts mit.
+ * Mit Bestätigung des Dialoges wird ein neues Teil angelegt.
+ */
+
+const newExhaust = PartTemplate.newPartFromTemplate(PartTemplate.EXHAUST_TEMPLATE)
+newExhaust.name.de = userInput;
+```
+
 Die betreffende Stelle im Quellcode konnte schnell abgeändert werden, um den Fehler zu beheben.  
 Idealerweise würden wir jedoch Code schreiben wollen, welcher solche Fehler beim Entwickeln bereits verhindert.  
 Wie könnte man so etwas lösen?
@@ -139,16 +173,70 @@ const bar: IHateStrings<MyString> = "Test"
 ### Erkenntnis
 Mit den nun etablierten Sprachfeatures können wir jetzt unseren definierten Typ zerlegen und nachvollziehen wie dieser funktioniert.  
 ```ts
-export type NonWritable<Type> = Type extends Object ? Readonly<{ [Property in keyof Type]: NonWritable<Type[Property]> }> : Type
+export type NonWritable<T> = T extends Object ? Readonly<{ [Property in keyof T]: NonWritable<T[Property]> }> : T
 ```
-Wir betrachten als Erstes ob unser generischer Typ `Type` von dem Typ `Object` erbt, also ob es sich um ein Primitiv handelt.  
+Wir betrachten als Erstes ob unser generischer Typ `T` von dem Typ `Object` erbt, also ob es sich um ein Primitiv handelt.  
 Im Falle eines primitiven Typs können wir diesen unverändert lassen, da dieser keine Attribute besitzt, welche auf `readonly` gesetzt werden können.  
 Andernfalls Kapseln wir den Typ mit dem `Readonly<T>` und mappen die Attribute des Typs ebenfalls auf unseren definierten Typ.  
 Auf diese steigen wir rekursiv die Typhierarchie ab und setzen alle Attribute die existieren auf `readonly`, somit erreichen wir völlige Schreibsperre für jeden beliebig komplexen Datentyp.
 
 ## Anwendung
 
-Livedemo: Noch mit Code ersetzen.
+### Beispiel Simpel
+
+```ts
+export class SomeClass {
+  public static readonly greetings:MultilanguageString = {en: "Hello", es: "Hola", de: "Hallo", fr: "Bonjour", it: "Ciao"}
+
+}
+
+export class SomeClass2 {
+  public static readonly greetings:NonWritable<MultilanguageString> = {en: "Hello", es: "Hola", de: "Hallo", fr: "Bonjour", it: "Ciao"}
+
+}
+
+SomeClass.greetings.de = "Tschüss"
+
+SomeClass2.greetings.de = "Tschüss"
+// TS2540: Cannot assign to de because it is a read-only property.
+```
+Die Einträge in `SomeClass.greetings` können geändert werden, was nicht erwünscht ist.  
+Die Einträge in `SomeClass2.greetings` sind hingegen wie gewollt `readonly`
+
+
+### Beispiel CarPart
+```ts
+import {CarPart, PartTemplate} from "./data-structures";
+
+
+/**
+ * Der Nutzer soll über einen Dialog einen neuen Auspuff im System anlegen können.
+ * In einem FormField wird der Standartname angezeigt, welcher der Nutzer ändern kann.
+ */
+
+const displayedName = PartTemplate.EXHAUST_TEMPLATE.name.de
+
+/**
+ * Binding erfolgt über model() Signal (Read & Write)
+ */
+
+const userInput = "Hochleistungsauspuff 1-15"
+
+/**
+ * Binding bewirkt implizite Überschreibung des Templates.
+ * Das wollten wir aber eigentlich garnicht.
+ */
+
+// Implizit
+PartTemplate.EXHAUST_TEMPLATE.name.de = userInput
+// TS2540: Cannot assign to de because it is a read-only property.
+// Fehler wurde erfolgreich zur Compiletime erkannt
+
+const newExhaust = PartTemplate.newPartFromTemplate(PartTemplate.EXHAUST_TEMPLATE as CarPart)
+// Entwickler muss NonWritables explizit an Methoden übergeben die kein NonWritable<> erwarten.
+newExhaust.name.de = userInput;
+
+```
 
 ### Referenzen
 

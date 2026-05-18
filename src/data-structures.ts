@@ -42,7 +42,7 @@ export class CarPart {
 export class PartTemplate {
     public static readonly SPRINGS_TEMPLATE: CarPart = new CarPart({de: "Feder"}, "springs", [])
     public static readonly RIMS_TEMPLATE: CarPart = new CarPart({de: "Felge"}, "rims", [])
-    public static readonly EXHAUST_TEMPLATE: CarPart = new CarPart({de: "Auspuff"}, "exhaust", [])
+    public static readonly EXHAUST_TEMPLATE: NonWritable<CarPart> = new CarPart({de: "Auspuff"}, "exhaust", [])
     public static readonly WINDOW_TEMPLATE: CarPart = new CarPart({de: "Scheibe"}, "window", [])
 
     public static newPartFromTemplate(template: CarPart): CarPart {

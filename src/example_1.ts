@@ -1,4 +1,4 @@
-import {PartTemplate} from "./data-structures";
+import {CarPart, PartTemplate} from "./data-structures";
 
 
 /**
@@ -27,5 +27,5 @@ PartTemplate.EXHAUST_TEMPLATE.name.de = userInput
  * Mit Bestätigung des Dialoges wird ein neues Teil angelegt.
  */
 
-const newExhaust = PartTemplate.newPartFromTemplate(PartTemplate.EXHAUST_TEMPLATE)
+const newExhaust = PartTemplate.newPartFromTemplate(PartTemplate.EXHAUST_TEMPLATE as CarPart)
 newExhaust.name.de = userInput;
